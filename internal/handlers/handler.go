@@ -2,48 +2,57 @@ package handlers
 
 import (
 	"context"
+	"html/template"
 	"log"
 	"net/http"
+	
 
-	"github.com/gin-gonic/gin"
-	"github.com/google/generative-ai-go/genai"
-	"google.golang.org/api/option"
+	"github.com/tmc/langchaingo/llms"
+	"github.com/tmc/langchaingo/llms/googleai"
+	"github.com/tmc/langchaingo/schema"
 )
 
-func BetaTest(c *gin.Context) {
-	ctx := context.Background()
-	// Access your API key as an environment variable (see "Set up your API key" above)
-	client, err := genai.NewClient(ctx, option.WithAPIKey("AIzaSyBVOPL1HI_kRF2nsgByUz-EX7-YRbV6K_Q"))
+type Page struct {
+	Images []string
+}
+
+var tmpl = template.Must(template.ParseFiles("../static/index.html"))
+
+func IndexHandler(w http.ResponseWriter, r *http.Request) {
+	err := tmpl.Execute(w, nil)
 	if err != nil {
-		log.Fatal(err)
+		log.Printf("Template execution error: %v", err)
+		http.Error(w, "Error rendering template", http.StatusInternalServerError)
 	}
-	defer client.Close()
+}
 
-	// The Gemini 1.5 models are versatile and work with most use cases
-	model := client.GenerativeModel("gemini-pro")
-	resp, err := model.GenerateContent(ctx, genai.Text("essay about weather."))
+func GenerateHandler(w http.ResponseWriter, r *http.Request, llm *googleai.GoogleAI) {
+	prompt := r.FormValue("prompt")
+
+	if prompt == "" {
+		http.Error(w, "Error: prompt is required", http.StatusBadRequest)
+		return
+	}
+
+	content := []llms.MessageContent{
+		{
+			Role: schema.ChatMessageTypeHuman,
+			Parts: []llms.ContentPart{
+				llms.TextPart(prompt),
+			},
+		},
+	}
+
+	_, err := llm.GenerateContent(r.Context(), content,
+		llms.WithModel("gemini-1.5-flash"),
+		llms.WithMaxTokens(500),
+		llms.WithStreamingFunc(func(ctx context.Context, chunk []byte) error {
+			w.Write(chunk)
+			return nil
+		}),
+	)
 	if err != nil {
-		log.Fatal(err)
+		log.Printf("Error generating content: %v\n", err)
+		http.Error(w, "Error: unable to generate content", http.StatusInternalServerError)
 	}
-
-	if resp != nil {
-		candidates := resp.Candidates
-		if candidates != nil {
-			var result []string
-			for _, candidate := range candidates {
-				content := candidate.Content
-				if content != "" {
-					result = append(result, content)
-				}
-			}
-			c.JSON(http.StatusOK, gin.H{
-				"result": result,
-			})
-			return
-		}
-	}
-
-	c.JSON(http.StatusInternalServerError, gin.H{
-		"error": "No candidates found",
-	})
 }
