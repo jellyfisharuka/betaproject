@@ -6,6 +6,8 @@ import (
 	"github.com/gorilla/mux"
 	"github.com/tmc/langchaingo/llms/googleai"
 	"betaproject/internal/handlers"
+	"github.com/swaggo/http-swagger"
+	_ "betaproject/docs" // импортируйте свои swagger-документы
 )
 
 // NewRouter creates and initializes the router with all routes
@@ -23,6 +25,8 @@ func NewRouter(llm *googleai.GoogleAI) *mux.Router {
 
 	// Define the index route
 	r.HandleFunc("/", handlers.IndexHandler).Methods("GET")
+	r.PathPrefix("/swagger/").Handler(httpSwagger.WrapHandler)
+
 
 	return r
 }

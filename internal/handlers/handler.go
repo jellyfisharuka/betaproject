@@ -25,6 +25,16 @@ func IndexHandler(w http.ResponseWriter, r *http.Request) {
 		http.Error(w, "Error rendering template", http.StatusInternalServerError)
 	}
 }
+// GenerateHandler godoc
+// @Summary Generate content
+// @Description Generate content based on the given prompt
+// @Tags generate
+// @Accept x-www-form-urlencoded
+// @Produce plain
+// @Param prompt formData string true "Prompt"
+// @Success 200 {string} string "Generated content"
+// @Failure 500 {string} string "Internal Server Error"
+// @Router /api/generate [post]
 
 func GenerateHandler(w http.ResponseWriter, r *http.Request, llm *googleai.GoogleAI) {
 	prompt := r.FormValue("prompt")
