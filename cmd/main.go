@@ -1,6 +1,6 @@
 package main
 
-import "betaproject/router"
+import "betaproject/internal/router"
 
 func main() {
 
