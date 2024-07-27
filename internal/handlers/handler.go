@@ -26,7 +26,7 @@ func IndexHandler(w http.ResponseWriter, r *http.Request) {
 	}
 }
 // GenerateHandler godoc
-// @Summary Generate content
+// @Summary GenerateContent
 // @Description Generate content based on the given prompt
 // @Tags generate
 // @Accept x-www-form-urlencoded
