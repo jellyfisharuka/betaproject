@@ -2,15 +2,15 @@ package handlers
 
 import (
 	"context"
-	"html/template"
 	"log"
 	"net/http"
-	
 
+	"github.com/gin-gonic/gin"
 	"github.com/tmc/langchaingo/llms"
 	"github.com/tmc/langchaingo/llms/googleai"
 	"github.com/tmc/langchaingo/schema"
 )
+
 // GenerateHandler godoc
 // @Summary GenerateContent
 // @Description Generate content based on the given prompt
@@ -21,11 +21,11 @@ import (
 // @Success 200 {string} string "Generated content"
 // @Failure 500 {string} string "Internal Server Error"
 // @Router /api/generate [post]
-func GenerateHandler(w http.ResponseWriter, r *http.Request, llm *googleai.GoogleAI) {
-	prompt := r.FormValue("prompt")
+func GenerateHandler(c *gin.Context, llm *googleai.GoogleAI) {
+	prompt := c.PostForm("prompt")
 
 	if prompt == "" {
-		http.Error(w, "Error: prompt is required", http.StatusBadRequest)
+		c.JSON(http.StatusBadRequest, gin.H{"error": "Prompt is required"})
 		return
 	}
 
@@ -38,30 +38,28 @@ func GenerateHandler(w http.ResponseWriter, r *http.Request, llm *googleai.Googl
 		},
 	}
 
-	_, err := llm.GenerateContent(r.Context(), content,
+	_, err := llm.GenerateContent(c.Request.Context(), content,
 		llms.WithModel("gemini-1.5-flash"),
 		llms.WithMaxTokens(500),
 		llms.WithStreamingFunc(func(ctx context.Context, chunk []byte) error {
-			w.Write(chunk)
+			c.Writer.Write(chunk)
 			return nil
 		}),
 	)
 	if err != nil {
 		log.Printf("Error generating content: %v\n", err)
-		http.Error(w, "Error: unable to generate content", http.StatusInternalServerError)
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "Unable to generate content"})
 	}
 }
 
-type Page struct {
-	Images []string
+// IndexHandler godoc
+// @Summary Index Page
+// @Description Renders the index page
+// @Tags index
+// @Produce html
+// @Success 200 {html} html "Index page"
+// @Router / [get]
+func IndexHandler(c *gin.Context) {
+    c.HTML(http.StatusOK, "index.html", nil)
 }
 
-var tmpl = template.Must(template.ParseFiles("../static/index.html"))
-
-func IndexHandler(w http.ResponseWriter, r *http.Request) {
-	err := tmpl.Execute(w, nil)
-	if err != nil {
-		log.Printf("Template execution error: %v", err)
-		http.Error(w, "Error rendering template", http.StatusInternalServerError)
-	}
-}

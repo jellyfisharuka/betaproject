@@ -1,23 +1,29 @@
 {
     "swagger": "2.0",
     "info": {
-        "description": "This is a sample server celler server.",
-        "title": "Swagger Example API",
-        "termsOfService": "http://swagger.io/terms/",
-        "contact": {
-            "name": "API Support",
-            "url": "http://www.swagger.io/support",
-            "email": "support@swagger.io"
-        },
-        "license": {
-            "name": "Apache 2.0",
-            "url": "http://www.apache.org/licenses/LICENSE-2.0.html"
-        },
-        "version": "1.0"
+        "contact": {}
     },
-    "host": "localhost:8080",
-    "basePath": "/api/v1",
     "paths": {
+        "/": {
+            "get": {
+                "description": "Renders the index page",
+                "produces": [
+                    "text/html"
+                ],
+                "tags": [
+                    "index"
+                ],
+                "summary": "Index Page",
+                "responses": {
+                    "200": {
+                        "description": "Index page",
+                        "schema": {
+                            "type": "html"
+                        }
+                    }
+                }
+            }
+        },
         "/api/generate": {
             "post": {
                 "description": "Generate content based on the given prompt",
@@ -56,14 +62,5 @@
                 }
             }
         }
-    },
-    "securityDefinitions": {
-        "BasicAuth": {
-            "type": "basic"
-        }
-    },
-    "externalDocs": {
-        "description": "OpenAPI",
-        "url": "https://swagger.io/resources/open-api/"
     }
 }

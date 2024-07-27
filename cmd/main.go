@@ -4,32 +4,17 @@ import (
 	"context"
 	"flag"
 	"log"
-	"net/http"
+	
 	"os"
-	_ "betaproject/docs"
+     _ "betaproject/docs"
+	"betaproject/internal/handlers"
 
+	"github.com/gin-gonic/gin"
 	"github.com/tmc/langchaingo/llms/googleai"
-	"betaproject/internal/router"
+	 ginSwagger "github.com/swaggo/gin-swagger"
+    swaggerFiles "github.com/swaggo/files"
 )
-// @title           Swagger Example API
-// @version         1.0
-// @description     This is a sample server celler server.
-// @termsOfService  http://swagger.io/terms/
 
-// @contact.name   API Support
-// @contact.url    http://www.swagger.io/support
-// @contact.email  support@swagger.io
-
-// @license.name  Apache 2.0
-// @license.url   http://www.apache.org/licenses/LICENSE-2.0.html
-
-// @host      localhost:8080
-// @BasePath  /api/v1
-
-// @securityDefinitions.basic  BasicAuth
-
-// @externalDocs.description  OpenAPI
-// @externalDocs.url          https://swagger.io/resources/open-api/
 var (
 	addr   = flag.String("addr", "localhost:8080", "address to serve")
 	apiKey = "AIzaSyBVOPL1HI_kRF2nsgByUz-EX7-YRbV6K_Q"
@@ -50,10 +35,22 @@ func main() {
 		log.Fatal(err)
 	}
 
-	// Initialize the router and handlers
-	r := router.NewRouter(llm)
+	// Initialize Gin router
+	r := gin.Default()
+
+	// Serve static files
+	r.Static("/static", "../static")
+
+	// Define API routes
+	r.POST("/api/generate", func(c *gin.Context) {
+		handlers.GenerateHandler(c, llm)
+	})
+
+	// Define the index route
+	r.GET("/", handlers.IndexHandler)
+	r.GET("/swagger/*any", ginSwagger.WrapHandler(swaggerFiles.Handler))
 
 	// Start the server
 	log.Printf("Starting server on %s", *addr)
-	log.Fatal(http.ListenAndServe(*addr, r))
+	log.Fatal(r.Run(*addr))
 }

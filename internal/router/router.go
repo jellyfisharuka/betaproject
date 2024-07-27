@@ -1,17 +1,18 @@
 package router
 
 import (
-	"net/http"
+	/*"net/http"
 
 	"github.com/gorilla/mux"
 	"github.com/tmc/langchaingo/llms/googleai"
 	"betaproject/internal/handlers"
 	"github.com/swaggo/http-swagger"
+	*/
 	_ "betaproject/docs" // импортируйте свои swagger-документы
 )
 
 // NewRouter creates and initializes the router with all routes
-func NewRouter(llm *googleai.GoogleAI) *mux.Router {
+/*func NewRouter(llm *googleai.GoogleAI) *mux.Router {
 	r := mux.NewRouter()
 
 	// Serve static files
@@ -30,3 +31,4 @@ func NewRouter(llm *googleai.GoogleAI) *mux.Router {
 
 	return r
 }
+	*/
