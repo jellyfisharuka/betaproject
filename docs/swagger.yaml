@@ -15,7 +15,32 @@ info:
   termsOfService: http://swagger.io/terms/
   title: Swagger Example API
   version: "1.0"
-paths: {}
+paths:
+  /api/generate:
+    post:
+      consumes:
+      - application/x-www-form-urlencoded
+      description: Generate content based on the given prompt
+      parameters:
+      - description: Prompt
+        in: formData
+        name: prompt
+        required: true
+        type: string
+      produces:
+      - text/plain
+      responses:
+        "200":
+          description: Generated content
+          schema:
+            type: string
+        "500":
+          description: Internal Server Error
+          schema:
+            type: string
+      summary: GenerateContent
+      tags:
+      - generate
 securityDefinitions:
   BasicAuth:
     type: basic

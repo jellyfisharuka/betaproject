@@ -6,6 +6,7 @@ import (
 	"log"
 	"net/http"
 	"os"
+	_ "betaproject/docs"
 
 	"github.com/tmc/langchaingo/llms/googleai"
 	"betaproject/internal/router"

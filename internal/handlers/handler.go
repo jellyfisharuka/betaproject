@@ -11,20 +11,6 @@ import (
 	"github.com/tmc/langchaingo/llms/googleai"
 	"github.com/tmc/langchaingo/schema"
 )
-
-type Page struct {
-	Images []string
-}
-
-var tmpl = template.Must(template.ParseFiles("../static/index.html"))
-
-func IndexHandler(w http.ResponseWriter, r *http.Request) {
-	err := tmpl.Execute(w, nil)
-	if err != nil {
-		log.Printf("Template execution error: %v", err)
-		http.Error(w, "Error rendering template", http.StatusInternalServerError)
-	}
-}
 // GenerateHandler godoc
 // @Summary GenerateContent
 // @Description Generate content based on the given prompt
@@ -35,7 +21,6 @@ func IndexHandler(w http.ResponseWriter, r *http.Request) {
 // @Success 200 {string} string "Generated content"
 // @Failure 500 {string} string "Internal Server Error"
 // @Router /api/generate [post]
-
 func GenerateHandler(w http.ResponseWriter, r *http.Request, llm *googleai.GoogleAI) {
 	prompt := r.FormValue("prompt")
 
@@ -64,5 +49,19 @@ func GenerateHandler(w http.ResponseWriter, r *http.Request, llm *googleai.Googl
 	if err != nil {
 		log.Printf("Error generating content: %v\n", err)
 		http.Error(w, "Error: unable to generate content", http.StatusInternalServerError)
+	}
+}
+
+type Page struct {
+	Images []string
+}
+
+var tmpl = template.Must(template.ParseFiles("../static/index.html"))
+
+func IndexHandler(w http.ResponseWriter, r *http.Request) {
+	err := tmpl.Execute(w, nil)
+	if err != nil {
+		log.Printf("Template execution error: %v", err)
+		http.Error(w, "Error rendering template", http.StatusInternalServerError)
 	}
 }
