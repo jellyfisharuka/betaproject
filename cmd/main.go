@@ -2,55 +2,63 @@ package main
 
 import (
 	"context"
-	"flag"
 	"log"
-	
-	"os"
-     _ "betaproject/docs"
-	"betaproject/internal/handlers"
 
-	"github.com/gin-gonic/gin"
-	"github.com/tmc/langchaingo/llms/googleai"
-	 ginSwagger "github.com/swaggo/gin-swagger"
-    swaggerFiles "github.com/swaggo/files"
-)
 
-var (
-	addr   = flag.String("addr", "localhost:8080", "address to serve")
-	apiKey = "AIzaSyBVOPL1HI_kRF2nsgByUz-EX7-YRbV6K_Q"
+	_ "betaproject/docs"
+	"betaproject/internal/app"
+	//"google.golang.org/api/gmail/v1"
 )
 
 func main() {
-	// Parse flags
-	flag.Parse()
+	ctx := context.Background()
 
-	// Get the Gemini API key from the environment, if set
-	if key := os.Getenv("API_KEY"); key != "" {
-		apiKey = key
-	}
-
-	// Initialize the Gemini API client
-	llm, err := googleai.New(context.Background(), googleai.WithAPIKey(apiKey))
+	a, err := app.NewApp(ctx)
 	if err != nil {
-		log.Fatal(err)
+		log.Fatalf("Error creating app: %v", err)
 	}
+	if err := a.Run(); err != nil {
+		log.Fatalf("Error running app: %v", err)
+	}
+	//r.Static("/static", "../static")
 
-	// Initialize Gin router
-	r := gin.Default()
-
-	// Serve static files
-	r.Static("/static", "../static")
-
-	// Define API routes
-	r.POST("/api/generate", func(c *gin.Context) {
-		handlers.GenerateHandler(c, llm)
-	})
-
-	// Define the index route
-	r.GET("/", handlers.IndexHandler)
-	r.GET("/swagger/*any", ginSwagger.WrapHandler(swaggerFiles.Handler))
+	//r.GET("/", handlers.IndexHandler)
+	//r.GET("/swagger/*any", ginSwagger.WrapHandler(swaggerFiles.Handler))
 
 	// Start the server
-	log.Printf("Starting server on %s", *addr)
-	log.Fatal(r.Run(*addr))
+
+	/*config := &oauth2.Config{
+        ClientID:     "480618086044-ptq8von436k9gslciacgic7c8p563l5r.apps.googleusercontent.com",
+        ClientSecret: "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",
+        Endpoint:     google.Endpoint,
+    }
+	token := &oauth2.Token{
+		AccessToken: "your-access-token",
+		TokenType:   "Bearer",
+	}
+
+    // Создаем HTTP клиент с OAuth2 токеном
+    getSMTPToken()
+    config.Client(context.Background(), token)
+
+    // Отправляем почту с помощью SMTP сервера
+    smtpHost := "smtp.gmail.com"
+    smtpPort := "587"
+    auth := smtp.PlainAuth("", "arukeulen@gmail.com", "", smtpHost)
+
+    to := []string{"recipient@example.com"}
+    msg := []byte("Subject: Test Email\n\nThis is a test email sent using OAuth 2.0.")
+
+    erro := smtp.SendMail(smtpHost+":"+smtpPort, auth, "arukeulen@gmail.com", to, msg)
+    if erro != nil {
+        log.Fatalf("Failed to send email: %v", err)
+    }
+
+    fmt.Println("Email sent successfully!")
+}
+func getSMTPToken() *oauth2.Token {
+    return &oauth2.Token{
+        AccessToken: "https://oauth2.googleapis.com/token", // Полученный токен
+    }
+}*/
 }
