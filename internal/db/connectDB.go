@@ -2,7 +2,9 @@ package db
 
 import (
 	"betaproject/internal/config"
+	"betaproject/internal/models"
 	"log"
+
 	//"os"
 
 	"gorm.io/driver/postgres"
@@ -20,7 +22,7 @@ func ConnectDB() {
 	}
 	log.Println("Successfully connected to database")
 
-	err = DB.AutoMigrate()
+	err = DB.AutoMigrate(models.Email{}, models.Role{}, models.User{})
 	if err != nil {
 		panic("Failed to migrate DB schemas")
 	}

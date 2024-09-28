@@ -62,4 +62,7 @@ func SetupRouter(r *gin.Engine)  {
 	r.GET("/", func(c *gin.Context) {
 		c.String(200, "Welcome to the API!")
 	})
+	r.POST("/login", handlers.LoginHandler)
+	r.POST("/signup", handlers.SignupHandler)
+	
 }
