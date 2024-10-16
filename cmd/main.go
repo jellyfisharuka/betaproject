@@ -17,7 +17,8 @@ import (
 	//"google.golang.org/api/gmail/v1"
 )
 
-
+// swag init
+//swag init -g cmd/main.go
 func main() {
 	ctx := context.Background()
 	b, err := os.ReadFile("gmail.json")
@@ -26,7 +27,7 @@ func main() {
 	}
 
 	// If modifying these scopes, delete your previously saved token.json.
-	config, err := google.ConfigFromJSON(b, gmail.GmailSendScope) //GmailReadOnly
+	config, err := google.ConfigFromJSON(b, gmail.GmailReadonlyScope) //GmailReadOnly
 	if err != nil {
 			log.Fatalf("Unable to parse client secret file to config: %v", err)
 	}

@@ -10,7 +10,7 @@ import (
 	"log"
 	"net/http"
 	"path/filepath"
-
+    _ "net/http/pprof"
 	"github.com/gin-gonic/gin"
 )
 
@@ -67,7 +67,10 @@ func (a *App) Run() error {
 	//address := "0.0.0.0:8080"
 	address := "localhost:8080"
 	log.Printf("HTTP server is running on %s", address)
-
+	go func() {
+        log.Println("Starting pprof server on :6060")
+        log.Println(http.ListenAndServe("localhost:6060", nil)) // Порт для pprof
+    }()
 	//err := http.ListenAndServe(address, a.router)
 	err:= a.router.Run(address)
 	if err != nil {

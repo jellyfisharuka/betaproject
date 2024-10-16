@@ -22,9 +22,16 @@ import (
 // @Failure 500 {string} string "Internal Server Error"
 // @Router /api/generate [post]
 func GenerateHandler(c *gin.Context, llm *googleai.GoogleAI) {
-	prompt := c.PostForm("prompt")
+	
+	prompt, exists := c.Get("prompt")
 
-	if prompt == "" {
+	if !exists {
+		// Если в контексте нет prompt, пытаемся получить его из формы
+		prompt = c.PostForm("prompt")
+	}
+
+	promptStr, ok := prompt.(string)
+	if !ok || promptStr == "" {
 		c.JSON(http.StatusBadRequest, gin.H{"error": "Prompt is required"})
 		return
 	}
@@ -33,7 +40,7 @@ func GenerateHandler(c *gin.Context, llm *googleai.GoogleAI) {
 		{
 			Role: schema.ChatMessageTypeHuman,
 			Parts: []llms.ContentPart{
-				llms.TextPart(prompt),
+				llms.TextPart(promptStr),
 			},
 		},
 	}

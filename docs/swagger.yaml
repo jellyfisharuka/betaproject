@@ -1,4 +1,11 @@
 definitions:
+  models.Question:
+    properties:
+      max_length:
+        type: integer
+      question:
+        type: string
+    type: object
   models.User:
     type: object
 info:
@@ -42,6 +49,91 @@ paths:
       summary: GenerateContent
       tags:
       - generate
+  /api/generate/motivational_letter:
+    post:
+      consumes:
+      - application/x-www-form-urlencoded
+      description: Generate a motivational letter based on user data
+      parameters:
+      - description: Name
+        in: formData
+        name: name
+        required: true
+        type: string
+      - description: Age
+        in: formData
+        name: age
+        required: true
+        type: integer
+      - description: University
+        in: formData
+        name: university
+        required: true
+        type: string
+      - description: Country
+        in: formData
+        name: country
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      summary: Create Motivational Letter
+      tags:
+      - letters
+  /api/generate/python:
+    post:
+      consumes:
+      - application/json
+      description: Generate content based on the given prompt
+      parameters:
+      - description: Question to get answer for
+        in: body
+        name: question
+        required: true
+        schema:
+          $ref: '#/definitions/models.Question'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      summary: GenerateContent
+      tags:
+      - generate
+  /faq:
+    get:
+      consumes:
+      - application/json
+      description: Generate content based on the given prompt
+      parameters:
+      - description: Question to get answer for
+        in: query
+        name: question
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      summary: Get FAQ Answer
+      tags:
+      - faq
   /login:
     post:
       consumes:

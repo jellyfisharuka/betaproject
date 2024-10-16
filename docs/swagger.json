@@ -62,6 +62,134 @@
                 }
             }
         },
+        "/api/generate/motivational_letter": {
+            "post": {
+                "description": "Generate a motivational letter based on user data",
+                "consumes": [
+                    "application/x-www-form-urlencoded"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "letters"
+                ],
+                "summary": "Create Motivational Letter",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Name",
+                        "name": "name",
+                        "in": "formData",
+                        "required": true
+                    },
+                    {
+                        "type": "integer",
+                        "description": "Age",
+                        "name": "age",
+                        "in": "formData",
+                        "required": true
+                    },
+                    {
+                        "type": "string",
+                        "description": "University",
+                        "name": "university",
+                        "in": "formData",
+                        "required": true
+                    },
+                    {
+                        "type": "string",
+                        "description": "Country",
+                        "name": "country",
+                        "in": "formData",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": {
+                                "type": "string"
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/api/generate/python": {
+            "post": {
+                "description": "Generate content based on the given prompt",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "generate"
+                ],
+                "summary": "GenerateContent",
+                "parameters": [
+                    {
+                        "description": "Question to get answer for",
+                        "name": "question",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/models.Question"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": {
+                                "type": "string"
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/faq": {
+            "get": {
+                "description": "Generate content based on the given prompt",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "faq"
+                ],
+                "summary": "Get FAQ Answer",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Question to get answer for",
+                        "name": "question",
+                        "in": "query",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": {
+                                "type": "string"
+                            }
+                        }
+                    }
+                }
+            }
+        },
         "/login": {
             "post": {
                 "description": "Logs in an existing user",
@@ -174,6 +302,17 @@
         }
     },
     "definitions": {
+        "models.Question": {
+            "type": "object",
+            "properties": {
+                "max_length": {
+                    "type": "integer"
+                },
+                "question": {
+                    "type": "string"
+                }
+            }
+        },
         "models.User": {
             "type": "object"
         }

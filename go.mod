@@ -4,7 +4,7 @@ go 1.22.0
 
 require (
 	github.com/swaggo/swag v1.16.3
-	google.golang.org/api v0.189.0 // indirect
+	google.golang.org/api v0.189.0
 )
 
 require github.com/swaggo/files v1.0.1
@@ -80,7 +80,7 @@ require (
 	go.opentelemetry.io/otel v1.26.0 // indirect
 	go.opentelemetry.io/otel/metric v1.26.0 // indirect
 	go.opentelemetry.io/otel/trace v1.26.0 // indirect
-	golang.org/x/crypto v0.25.0 // indirect
+	golang.org/x/crypto v0.25.0
 	golang.org/x/net v0.27.0 // indirect
 	golang.org/x/oauth2 v0.21.0
 	golang.org/x/sync v0.7.0 // indirect
