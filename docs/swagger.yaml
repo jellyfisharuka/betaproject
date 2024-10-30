@@ -111,6 +111,44 @@ paths:
       summary: GenerateContent
       tags:
       - generate
+  /api/generate/recommendation_letter:
+    post:
+      consumes:
+      - application/x-www-form-urlencoded
+      description: Generate a basic recommendation letter based on provided user data
+      parameters:
+      - description: Candidate's Name
+        in: formData
+        name: name
+        required: true
+        type: string
+      - description: Relationship with Candidate
+        in: formData
+        name: relationship
+        required: true
+        type: string
+      - description: Key Achievements of Candidate
+        in: formData
+        name: achievements
+        required: true
+        type: string
+      - description: Key Qualities of Candidate
+        in: formData
+        name: qualities
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      summary: Create Recommendation Letter
+      tags:
+      - letters
   /faq:
     get:
       consumes:
@@ -134,6 +172,23 @@ paths:
       summary: Get FAQ Answer
       tags:
       - faq
+  /googleLogin:
+    get:
+      description: Redirects the user to Google's OAuth2 login page to initiate authorization.
+      produces:
+      - application/json
+      responses:
+        "302":
+          description: Redirects to Google login
+          schema:
+            type: string
+        "500":
+          description: OAuth2 config is not initialized
+          schema:
+            type: string
+      summary: Redirects to Google OAuth2 login
+      tags:
+      - Auth
   /login:
     post:
       consumes:

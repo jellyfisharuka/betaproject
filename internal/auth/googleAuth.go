@@ -2,19 +2,38 @@ package auth
 
 import (
 	"context"
+	"database/sql"
 	"encoding/json"
 	"fmt"
 	"log"
 	"net/http"
 	"os"
+	"time"
 
 	"golang.org/x/oauth2"
+	"google.golang.org/api/gmail/v1"
 )
 
+func SaveTokenToDB(db *sql.DB, userID string, token *oauth2.Token) error {
+    _, err := db.Exec("REPLACE INTO tokens (user_id, access_token, refresh_token, expiry) VALUES (?, ?, ?, ?)",
+        userID, token.AccessToken, token.RefreshToken, token.Expiry)
+    return err
+}
+func TokenFromDB(db *sql.DB, userID string) (*oauth2.Token, error) {
+    tok := &oauth2.Token{}
+    var expiry time.Time
+
+    err := db.QueryRow("SELECT access_token, refresh_token, expiry FROM tokens WHERE user_id = ?", userID).
+        Scan(&tok.AccessToken, &tok.RefreshToken, &expiry)
+
+    if err != nil {
+        return nil, err 
+    }
+    tok.Expiry = expiry
+    return tok, nil
+}
+
 func GetClient(config *oauth2.Config) *http.Client {
-	// The file token.json stores the user's access and refresh tokens, and is
-	// created automatically when the authorization flow completes for the first
-	// time.
 	tokFile := "token.json"
 	tok, err := TokenFromFile(tokFile)
 	if err != nil {
@@ -24,7 +43,6 @@ func GetClient(config *oauth2.Config) *http.Client {
 	return config.Client(context.Background(), tok)
 }
 
-// Request a token from the web, then returns the retrieved token.
 func GetTokenFromWeb(config *oauth2.Config) *oauth2.Token {
 	authURL := config.AuthCodeURL("state-token", oauth2.AccessTypeOffline)
 	fmt.Printf("Go to the following link in your browser then type the "+
@@ -42,7 +60,6 @@ func GetTokenFromWeb(config *oauth2.Config) *oauth2.Token {
 	return tok
 }
 
-// Retrieves a token from a local file.
 func TokenFromFile(file string) (*oauth2.Token, error) {
 	f, err := os.Open(file)
 	if err != nil {
@@ -54,7 +71,6 @@ func TokenFromFile(file string) (*oauth2.Token, error) {
 	return tok, err
 }
 
-// Saves a token to a file path.
 func SaveToken(path string, token *oauth2.Token) {
 	fmt.Printf("Saving credential file to: %s\n", path)
 	f, err := os.OpenFile(path, os.O_RDWR|os.O_CREATE|os.O_TRUNC, 0600)
@@ -63,4 +79,37 @@ func SaveToken(path string, token *oauth2.Token) {
 	}
 	defer f.Close()
 	json.NewEncoder(f).Encode(token)
+}
+func GetOAuth2Config(filePath string) (*oauth2.Config, error) {
+    f, err := os.Open(filePath)
+    if err != nil {
+        return nil, fmt.Errorf("unable to open client secret file: %v", err)
+    }
+    defer f.Close()
+
+    var config struct {
+        Web struct {
+            ClientID     string   `json:"client_id"`
+            ClientSecret string   `json:"client_secret"`
+            RedirectURIs []string `json:"redirect_uris"`
+            AuthURI      string   `json:"auth_uri"`
+            TokenURI     string   `json:"token_uri"`
+        } `json:"web"`
+    }
+
+    if err := json.NewDecoder(f).Decode(&config); err != nil {
+        return nil, fmt.Errorf("unable to parse client secret file to config: %v", err)
+    }
+	log.Printf("Loaded OAuth2 Config: %+v", config.Web)
+
+    return &oauth2.Config{
+        ClientID:     config.Web.ClientID,
+        ClientSecret: config.Web.ClientSecret,
+        RedirectURL:  config.Web.RedirectURIs[0], // или укажите конкретный URI
+        Scopes:       []string{gmail.GmailReadonlyScope}, // укажите необходимые scope
+        Endpoint: oauth2.Endpoint{
+            AuthURL:  config.Web.AuthURI,
+            TokenURL: config.Web.TokenURI,
+        },
+    }, nil
 }

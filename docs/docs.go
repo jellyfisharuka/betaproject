@@ -166,6 +166,62 @@ const docTemplate = `{
                 }
             }
         },
+        "/api/generate/recommendation_letter": {
+            "post": {
+                "description": "Generate a basic recommendation letter based on provided user data",
+                "consumes": [
+                    "application/x-www-form-urlencoded"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "letters"
+                ],
+                "summary": "Create Recommendation Letter",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Candidate's Name",
+                        "name": "name",
+                        "in": "formData",
+                        "required": true
+                    },
+                    {
+                        "type": "string",
+                        "description": "Relationship with Candidate",
+                        "name": "relationship",
+                        "in": "formData",
+                        "required": true
+                    },
+                    {
+                        "type": "string",
+                        "description": "Key Achievements of Candidate",
+                        "name": "achievements",
+                        "in": "formData",
+                        "required": true
+                    },
+                    {
+                        "type": "string",
+                        "description": "Key Qualities of Candidate",
+                        "name": "qualities",
+                        "in": "formData",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": {
+                                "type": "string"
+                            }
+                        }
+                    }
+                }
+            }
+        },
         "/faq": {
             "get": {
                 "description": "Generate content based on the given prompt",
@@ -196,6 +252,32 @@ const docTemplate = `{
                             "additionalProperties": {
                                 "type": "string"
                             }
+                        }
+                    }
+                }
+            }
+        },
+        "/googleLogin": {
+            "get": {
+                "description": "Redirects the user to Google's OAuth2 login page to initiate authorization.",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Auth"
+                ],
+                "summary": "Redirects to Google OAuth2 login",
+                "responses": {
+                    "302": {
+                        "description": "Redirects to Google login",
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    "500": {
+                        "description": "OAuth2 config is not initialized",
+                        "schema": {
+                            "type": "string"
                         }
                     }
                 }

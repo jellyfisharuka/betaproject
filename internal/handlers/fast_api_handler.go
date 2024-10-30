@@ -28,22 +28,19 @@ func GeneratePythonHandler(c *gin.Context) {
 		return
 	}
 
-	// Формируем ответ
 	c.JSON(http.StatusOK, models.AnswerResponse{Answer: answer})
 	
 }
 func generateAnswer(question string, maxLength int) (string, error) {
-	// Формируем тело запроса
+	const defaultMaxLength = 50
 	requestBody := models.Question{
 		Question:  question,
-		MaxLength: maxLength,
 	}
 	jsonData, err := json.Marshal(requestBody)
 	if err != nil {
 		return "", err
 	}
 
-	// Выполняем запрос к API с OAuth 2 токеном
 	client := &http.Client{}
 	req, err := http.NewRequest("POST", "http://localhost:8000/generate/", bytes.NewBuffer(jsonData))
 	if err != nil {
@@ -57,7 +54,6 @@ func generateAnswer(question string, maxLength int) (string, error) {
 	}
 	defer resp.Body.Close()
 
-	// Обрабатываем ответ
 	var answerResponse models.AnswerResponse
 	err = json.NewDecoder(resp.Body).Decode(&answerResponse)
 	if err != nil {

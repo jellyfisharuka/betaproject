@@ -12,6 +12,8 @@ import (
 	"path/filepath"
     _ "net/http/pprof"
 	"github.com/gin-gonic/gin"
+	"github.com/gin-contrib/sessions"
+    "github.com/gin-contrib/sessions/cookie"
 )
 
 type App struct {
@@ -93,7 +95,9 @@ func CORSMiddleware() gin.HandlerFunc {
 	}
 }
 func (a *App) initRouter(_ context.Context) error {
+	store := cookie.NewStore([]byte("secret"))
 	a.router = gin.Default()
+	a.router.Use(sessions.Sessions("mysession", store))
 	a.router.Use(CORSMiddleware())
 	router.SetupRouter(a.router)
 	return nil

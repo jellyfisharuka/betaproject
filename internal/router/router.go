@@ -9,6 +9,7 @@ import (
 	"github.com/swaggo/http-swagger"
 	*/
 	_ "betaproject/docs" // импортируйте свои swagger-документы
+	"betaproject/internal/auth"
 	"betaproject/internal/handlers"
 	"context"
 	"log"
@@ -19,6 +20,7 @@ import (
 	swaggerFiles "github.com/swaggo/files"
 	ginSwagger "github.com/swaggo/gin-swagger"
 	"github.com/tmc/langchaingo/llms/googleai"
+	
 )
 
 // NewRouter creates and initializes the router with all routes
@@ -59,6 +61,14 @@ func SetupRouter(r *gin.Engine)  {
 		log.Fatal(err)
 	}
 	
+	handlers.Oauth2Config, err = auth.GetOAuth2Config("C:/Users/aruke/Desktop/golang/betaproject/cmd/gmail.json")
+    if err != nil {
+	log.Fatalf("Error loading OAuth2 configuration: %v", err)
+}
+log.Printf("OAuth2 Configuration: %+v", handlers.Oauth2Config)
+if handlers.Oauth2Config == nil {
+    log.Fatalf("OAuth2 configuration is nil")
+}
 	r.GET("/swagger/*any", ginSwagger.WrapHandler(swaggerFiles.Handler))
 	//r.GET("/", handlers.IndexHandler)
 	//r.POST("/api/generate", func(c *gin.Context) {
@@ -69,11 +79,12 @@ func SetupRouter(r *gin.Engine)  {
 	r.POST("/api/generate/python", handlers.GeneratePythonHandler)
 	r.POST("/api/generate/motivational_letter", func(c *gin.Context) {
 		handlers.CreateMotivationalLetterHandler(c, llm)})
-	r.GET("/", func(c *gin.Context) {
-		c.String(200, "Welcome to the API!")
-	})
+		r.POST("/api/generate/recommendation_letter", func(c *gin.Context) {
+			handlers.CreateRecommendationLetterHandler(c, llm)})
 	r.POST("/login", handlers.LoginHandler)
 	r.POST("/signup", handlers.SignupHandler)
+	r.GET("/oauth2callback", handlers.OAuth2CallbackHandler)
+	r.GET("/googleLogin", handlers.LoginGoogleHandler(handlers.Oauth2Config))
 	r.GET("/faq", handlers.FAQHandler)
     pprofGroup := r.Group("/debug/pprof")
     {
