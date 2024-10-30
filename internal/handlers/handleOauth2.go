@@ -7,7 +7,7 @@ import (
 	"log"
 	"net/http"
 	"os"
-
+    "betaproject/internal/gooogle"
 	"github.com/gin-gonic/gin"
 	"github.com/gin-contrib/sessions"
 	"golang.org/x/oauth2"
@@ -40,6 +40,21 @@ func HandleOAuth2Callback(code string, c *gin.Context) (*oauth2.Token, error) {
 		log.Fatalf("Unable to retrieve token from web: %v", err)
 		return nil, err
 	}
+	accessToken := tok.AccessToken
+	fmt.Println(accessToken)
+	userEmail, err:= gooogle.GetUserInfo(accessToken)
+	if err!=nil {
+		fmt.Println("error getting user info:", err)
+		return nil, err
+	}
+	subject := "Blabla"
+	body:="bla bla welcome"
+	err = gooogle.SendEmail(accessToken, userEmail, subject, body)
+	if err!=nil {
+		fmt.Println("error sending email: ", err)
+		return nil, err
+	}
+	fmt.Println("Email sent successfully to: ", userEmail)
 	session:= sessions.Default(c)
 	session.Set("access_token", tok.AccessToken)
 	session.Set("refresh_token", tok.RefreshToken)
