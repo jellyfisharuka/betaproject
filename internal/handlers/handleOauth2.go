@@ -47,14 +47,16 @@ func HandleOAuth2Callback(code string, c *gin.Context) (*oauth2.Token, error) {
 		fmt.Println("error getting user info:", err)
 		return nil, err
 	}
-	subject := "Blabla"
-	body:="bla bla welcome"
-	err = gooogle.SendEmail(accessToken, userEmail, subject, body)
+	gooogle.WelcomePush(userEmail)
+	/*from := "arukeulen@gmail.com" 
+    subject := "Blabla"
+    body := fmt.Sprintf("Dear user,\n\nThis is a message from YourCompany.\n\n%s", "Welcome to our service!")
+	err = gooogle.SendEmail(accessToken, from,userEmail, subject, body)
 	if err!=nil {
 		fmt.Println("error sending email: ", err)
 		return nil, err
-	}
-	fmt.Println("Email sent successfully to: ", userEmail)
+	} */
+	fmt.Println("Email sent successfully to: ", userEmail) 
 	session:= sessions.Default(c)
 	session.Set("access_token", tok.AccessToken)
 	session.Set("refresh_token", tok.RefreshToken)

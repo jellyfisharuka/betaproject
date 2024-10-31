@@ -10,8 +10,8 @@ import (
 type Email struct {
 	Raw string `json:"raw"`
 }
-func SendEmail(accessToken, to, subject, body string) error {
-	email := fmt.Sprintf("To: %s\r\nSubject: %s\r\n\r\n%s", to, subject, body)
+func SendEmail(accessToken,from, to, subject, body string) error {
+	email := fmt.Sprintf("From: %s\r\nTo: %s\r\nSubject: %s\r\n\r\n%s", from, to, subject, body)
 	emailBase64 := base64.URLEncoding.EncodeToString([]byte(email))
 	emailData := Email{Raw:emailBase64}
 	jsonData, err := json.Marshal(emailData)
