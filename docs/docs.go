@@ -75,6 +75,11 @@ const docTemplate = `{
         },
         "/api/generate/motivational_letter": {
             "post": {
+                "security": [
+                    {
+                        "Bearer": []
+                    }
+                ],
                 "description": "Generate a motivational letter based on user data",
                 "consumes": [
                     "application/x-www-form-urlencoded"
@@ -298,12 +303,12 @@ const docTemplate = `{
                 "summary": "Login user",
                 "parameters": [
                     {
-                        "description": "User credentials",
+                        "description": "New user information",
                         "name": "user",
                         "in": "body",
                         "required": true,
                         "schema": {
-                            "$ref": "#/definitions/models.User"
+                            "$ref": "#/definitions/models.LoginSwagger"
                         }
                     }
                 ],
@@ -358,7 +363,7 @@ const docTemplate = `{
                         "in": "body",
                         "required": true,
                         "schema": {
-                            "$ref": "#/definitions/models.User"
+                            "$ref": "#/definitions/models.SignupSwagger"
                         }
                     }
                 ],
@@ -395,6 +400,19 @@ const docTemplate = `{
         }
     },
     "definitions": {
+        "models.LoginSwagger": {
+            "type": "object",
+            "properties": {
+                "password": {
+                    "description": "Пароль пользователя",
+                    "type": "string"
+                },
+                "username": {
+                    "description": "Уникальное имя пользователя",
+                    "type": "string"
+                }
+            }
+        },
         "models.Question": {
             "type": "object",
             "properties": {
@@ -406,20 +424,53 @@ const docTemplate = `{
                 }
             }
         },
-        "models.User": {
-            "type": "object"
+        "models.SignupSwagger": {
+            "type": "object",
+            "properties": {
+                "firstName": {
+                    "description": "Имя пользователя",
+                    "type": "string"
+                },
+                "lastName": {
+                    "description": "Фамилия пользователя",
+                    "type": "string"
+                },
+                "password": {
+                    "description": "Пароль пользователя",
+                    "type": "string"
+                },
+                "roleID": {
+                    "description": "ID роли пользователя",
+                    "type": "integer"
+                },
+                "telephone": {
+                    "description": "Номер телефона пользователя",
+                    "type": "string"
+                },
+                "username": {
+                    "description": "Уникальное имя пользователя",
+                    "type": "string"
+                }
+            }
+        }
+    },
+    "securityDefinitions": {
+        "Bearer": {
+            "type": "apiKey",
+            "name": "Authorization",
+            "in": "header"
         }
     }
 }`
 
 // SwaggerInfo holds exported Swagger Info so clients can modify it
 var SwaggerInfo = &swag.Spec{
-	Version:          "",
+	Version:          "1.0",
 	Host:             "",
 	BasePath:         "",
 	Schemes:          []string{},
-	Title:            "",
-	Description:      "",
+	Title:            "Beta Project",
+	Description:      "This is a sample server.",
 	InfoInstanceName: "swagger",
 	SwaggerTemplate:  docTemplate,
 	LeftDelim:        "{{",

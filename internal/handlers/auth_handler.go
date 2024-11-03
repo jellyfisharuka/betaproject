@@ -6,17 +6,19 @@ import (
 	"betaproject/internal/models"
 	"fmt"
 	"net/http"
+	
 
 	"github.com/gin-gonic/gin"
 	"github.com/go-playground/validator"
 )
+
 
 // @Summary Login user
 // @Description Logs in an existing user
 // @Tags Auth
 // @Accept  json
 // @Produce  json
-// @Param   user  body      models.User  true  "User credentials"
+// @Param   user  body      models.LoginSwagger  true  "New user information"  Example: {"username": "exampleUser", "password": "examplePassword"}
 // @Success 200    {object}  map[string]string
 // @Failure 400    {object}  map[string]string
 // @Failure 401    {object}  map[string]string
@@ -49,7 +51,7 @@ func LoginHandler(c *gin.Context) {
 // @Tags Auth
 // @Accept  json
 // @Produce  json
-// @Param   user  body      models.User  true  "New user information"
+// @Param   user  body      models.SignupSwagger  true  "New user information"  Example: {"username": "exampleUser", "password": "examplePassword", "firstName": "John", "lastName": "Doe"}
 // @Success 201    {object}  map[string]string
 // @Failure 400    {object}  map[string]string
 // @Failure 500    {object}  map[string]string
@@ -74,3 +76,4 @@ func SignupHandler(c *gin.Context) {
 	c.JSON(http.StatusCreated, gin.H{"message": "User signed up successfully"})
 
 }
+

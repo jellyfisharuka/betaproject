@@ -12,7 +12,7 @@ import (
 // @Description Generate a basic recommendation letter based on provided user data
 // @Tags letters
 // @Accept application/x-www-form-urlencoded
-// @Produce json
+// @Produce json 
 // @Param name formData string true "Candidate's Name"
 // @Param relationship formData string true "Relationship with Candidate"
 // @Param achievements formData string true "Key Achievements of Candidate"

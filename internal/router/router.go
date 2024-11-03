@@ -48,12 +48,8 @@ var (
 	apiKey = "AIzaSyBVOPL1HI_kRF2nsgByUz-EX7-YRbV6K_Q"
 	llm *googleai.GoogleAI
 )
-// @Beta Project
-// @version 1.0
-// @description This is a sample server.
 
-// @host localhost:8080
-// @BasePath /
+
 func SetupRouter(r *gin.Engine)  {
 	var err error
     llm, err = googleai.New(context.Background(), googleai.WithAPIKey(apiKey))
@@ -77,7 +73,7 @@ if handlers.Oauth2Config == nil {
 	r.POST("/api/generate", func(c *gin.Context) {
 		handlers.GenerateHandler(c, llm)})
 	r.POST("/api/generate/python", handlers.GeneratePythonHandler)
-	r.POST("/api/generate/motivational_letter", func(c *gin.Context) {
+	r.POST("/api/generate/motivational_letter", auth.AuthMiddleware(), func(c *gin.Context) {
 		handlers.CreateMotivationalLetterHandler(c, llm)})
 		r.POST("/api/generate/recommendation_letter", func(c *gin.Context) {
 			handlers.CreateRecommendationLetterHandler(c, llm)})

@@ -7,7 +7,8 @@ import (
 	"github.com/gin-gonic/gin"
 	"github.com/tmc/langchaingo/llms/googleai"
 )
-
+// @Security Bearer
+// @Security GoogleOAuth
 // @Summary Create Motivational Letter
 // @Description Generate a motivational letter based on user data
 // @Tags letters

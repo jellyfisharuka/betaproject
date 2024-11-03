@@ -1,7 +1,10 @@
 {
     "swagger": "2.0",
     "info": {
-        "contact": {}
+        "description": "This is a sample server.",
+        "title": "Beta Project",
+        "contact": {},
+        "version": "1.0"
     },
     "paths": {
         "/": {
@@ -64,6 +67,11 @@
         },
         "/api/generate/motivational_letter": {
             "post": {
+                "security": [
+                    {
+                        "Bearer": []
+                    }
+                ],
                 "description": "Generate a motivational letter based on user data",
                 "consumes": [
                     "application/x-www-form-urlencoded"
@@ -287,12 +295,12 @@
                 "summary": "Login user",
                 "parameters": [
                     {
-                        "description": "User credentials",
+                        "description": "New user information",
                         "name": "user",
                         "in": "body",
                         "required": true,
                         "schema": {
-                            "$ref": "#/definitions/models.User"
+                            "$ref": "#/definitions/models.LoginSwagger"
                         }
                     }
                 ],
@@ -347,7 +355,7 @@
                         "in": "body",
                         "required": true,
                         "schema": {
-                            "$ref": "#/definitions/models.User"
+                            "$ref": "#/definitions/models.SignupSwagger"
                         }
                     }
                 ],
@@ -384,6 +392,19 @@
         }
     },
     "definitions": {
+        "models.LoginSwagger": {
+            "type": "object",
+            "properties": {
+                "password": {
+                    "description": "Пароль пользователя",
+                    "type": "string"
+                },
+                "username": {
+                    "description": "Уникальное имя пользователя",
+                    "type": "string"
+                }
+            }
+        },
         "models.Question": {
             "type": "object",
             "properties": {
@@ -395,8 +416,41 @@
                 }
             }
         },
-        "models.User": {
-            "type": "object"
+        "models.SignupSwagger": {
+            "type": "object",
+            "properties": {
+                "firstName": {
+                    "description": "Имя пользователя",
+                    "type": "string"
+                },
+                "lastName": {
+                    "description": "Фамилия пользователя",
+                    "type": "string"
+                },
+                "password": {
+                    "description": "Пароль пользователя",
+                    "type": "string"
+                },
+                "roleID": {
+                    "description": "ID роли пользователя",
+                    "type": "integer"
+                },
+                "telephone": {
+                    "description": "Номер телефона пользователя",
+                    "type": "string"
+                },
+                "username": {
+                    "description": "Уникальное имя пользователя",
+                    "type": "string"
+                }
+            }
+        }
+    },
+    "securityDefinitions": {
+        "Bearer": {
+            "type": "apiKey",
+            "name": "Authorization",
+            "in": "header"
         }
     }
 }

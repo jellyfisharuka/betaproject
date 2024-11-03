@@ -1,4 +1,13 @@
 definitions:
+  models.LoginSwagger:
+    properties:
+      password:
+        description: Пароль пользователя
+        type: string
+      username:
+        description: Уникальное имя пользователя
+        type: string
+    type: object
   models.Question:
     properties:
       max_length:
@@ -6,10 +15,32 @@ definitions:
       question:
         type: string
     type: object
-  models.User:
+  models.SignupSwagger:
+    properties:
+      firstName:
+        description: Имя пользователя
+        type: string
+      lastName:
+        description: Фамилия пользователя
+        type: string
+      password:
+        description: Пароль пользователя
+        type: string
+      roleID:
+        description: ID роли пользователя
+        type: integer
+      telephone:
+        description: Номер телефона пользователя
+        type: string
+      username:
+        description: Уникальное имя пользователя
+        type: string
     type: object
 info:
   contact: {}
+  description: This is a sample server.
+  title: Beta Project
+  version: "1.0"
 paths:
   /:
     get:
@@ -84,6 +115,8 @@ paths:
             additionalProperties:
               type: string
             type: object
+      security:
+      - Bearer: []
       summary: Create Motivational Letter
       tags:
       - letters
@@ -195,12 +228,12 @@ paths:
       - application/json
       description: Logs in an existing user
       parameters:
-      - description: User credentials
+      - description: New user information
         in: body
         name: user
         required: true
         schema:
-          $ref: '#/definitions/models.User'
+          $ref: '#/definitions/models.LoginSwagger'
       produces:
       - application/json
       responses:
@@ -236,7 +269,7 @@ paths:
         name: user
         required: true
         schema:
-          $ref: '#/definitions/models.User'
+          $ref: '#/definitions/models.SignupSwagger'
       produces:
       - application/json
       responses:
@@ -261,4 +294,9 @@ paths:
       summary: Sign up user
       tags:
       - Auth
+securityDefinitions:
+  Bearer:
+    in: header
+    name: Authorization
+    type: apiKey
 swagger: "2.0"

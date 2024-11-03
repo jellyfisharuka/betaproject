@@ -1,3 +1,11 @@
+// @title Beta Project
+// @version 1.0
+// @description This is a sample server.
+// @securityDefinitions.apiKey Bearer
+// @in header
+// @name Authorization
+// @host localhost:8080
+// @BasePath /
 package main
 
 import (

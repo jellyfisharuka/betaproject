@@ -1,6 +1,6 @@
 package db
 
-/*import (
+import (
 	"log"
 
 	"github.com/joho/godotenv"
@@ -11,4 +11,4 @@ func GetKeysInEnv() {
 	if err != nil {
 		log.Fatal("Error loading .env file", err)
 	}
-}*/
+}
