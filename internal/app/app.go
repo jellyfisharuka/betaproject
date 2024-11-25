@@ -46,7 +46,7 @@ func (a *App) initConfig(_ context.Context) error {
         return err
     }
 	db.ConnectDB()
-	db.InitRedis()
+	//db.InitRedis()
 
 	return nil
 
@@ -67,8 +67,8 @@ func (a *App) initDeps(ctx context.Context) error {
 	return nil
 }
 func (a *App) Run() error {
-	//address := "0.0.0.0:8080"
-	address := "localhost:8080"
+	address := "0.0.0.0:8080"
+	//address := "localhost:8080"
 	log.Printf("HTTP server is running on %s", address)
 	go func() {
         log.Println("Starting pprof server on :6060")

@@ -5,6 +5,7 @@ import (
 	"betaproject/internal/models"
 	"context"
 	"log"
+	"time"
 
 	//"os"
 
@@ -35,13 +36,21 @@ func ConnectDB() {
 
 }
 func InitRedis() {
-	RedisClient = redis.NewClient(&redis.Options{
-		Addr: "localhost:6379", 
-		DB:   0,                
-	})
+    for i := 0; i < 5; i++ {
+        RedisClient = redis.NewClient(&redis.Options{
+            Addr: "redis:6379",
+            DB:   0,
+        })
 
-	if err := RedisClient.Ping(Ctx).Err(); err != nil {
-		log.Fatalf("Could not connect to Redis: %v", err)
-	}
+        err := RedisClient.Ping(Ctx).Err()
+        if err == nil {
+            log.Println("Successfully connected to Redis")
+            return
+        }
+
+        log.Printf("Redis not ready, retrying... (%d/5)", i+1)
+        time.Sleep(2 * time.Second)
+    }
+    log.Fatalf("Could not connect to Redis after retries")
 }
 
