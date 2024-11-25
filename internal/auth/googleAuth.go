@@ -105,14 +105,14 @@ func GetOAuth2Config(filePath string) (*oauth2.Config, error) {
     return &oauth2.Config{
         ClientID:     config.Web.ClientID,
         ClientSecret: config.Web.ClientSecret,
-        RedirectURL:  config.Web.RedirectURIs[0], // или укажите конкретный URI
+        RedirectURL:  config.Web.RedirectURIs[0], 
         Scopes:       []string{
 			gmail.GmailReadonlyScope,
 			"https://www.googleapis.com/auth/userinfo.email", // для получения email
             "https://www.googleapis.com/auth/userinfo.profile", // для получения информации о профиле
             "https://www.googleapis.com/auth/gmail.readonly",
 			"https://www.googleapis.com/auth/gmail.send",
-			}, // укажите необходимые scope
+			}, 
         Endpoint: oauth2.Endpoint{
             AuthURL:  config.Web.AuthURI,
             TokenURL: config.Web.TokenURI,

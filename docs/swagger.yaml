@@ -1,4 +1,21 @@
+basePath: /
 definitions:
+  handlers.ErrorResponse:
+    properties:
+      error:
+        type: string
+    type: object
+  models.Chat:
+    properties:
+      id:
+        type: integer
+      messages:
+        items:
+          $ref: '#/definitions/models.Message'
+        type: array
+      userID:
+        type: integer
+    type: object
   models.LoginSwagger:
     properties:
       password:
@@ -7,6 +24,34 @@ definitions:
       username:
         description: Уникальное имя пользователя
         type: string
+    type: object
+  models.Message:
+    properties:
+      answer:
+        type: string
+      chatID:
+        type: integer
+      createdAt:
+        type: string
+      id:
+        type: integer
+      prompt:
+        description: Запрос (prompt) пользователя
+        type: string
+      senderID:
+        type: integer
+    type: object
+  models.MessageSwagger:
+    properties:
+      chatID:
+        description: The ID of the chat
+        type: integer
+      prompt:
+        description: The message content (input from user)
+        type: string
+      senderID:
+        description: The ID of the user sending the message
+        type: integer
     type: object
   models.Question:
     properties:
@@ -36,6 +81,7 @@ definitions:
         description: Уникальное имя пользователя
         type: string
     type: object
+host: localhost:8080
 info:
   contact: {}
   description: This is a sample server.
@@ -117,6 +163,7 @@ paths:
             type: object
       security:
       - Bearer: []
+      - GoogleOAuth: []
       summary: Create Motivational Letter
       tags:
       - letters
@@ -182,6 +229,127 @@ paths:
       summary: Create Recommendation Letter
       tags:
       - letters
+  /chats:
+    get:
+      consumes:
+      - application/json
+      description: Retrieve all chats
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/models.Chat'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/handlers.ErrorResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/handlers.ErrorResponse'
+      security:
+      - Bearer: []
+      summary: Get all chats
+      tags:
+      - chats
+    post:
+      consumes:
+      - application/json
+      description: Create a new chat by providing the chat details (empty by default)
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: Created
+          schema:
+            $ref: '#/definitions/models.Chat'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/handlers.ErrorResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/handlers.ErrorResponse'
+      security:
+      - Bearer: []
+      summary: Create a new chat
+      tags:
+      - chats
+  /chats/{chatID}/messages:
+    post:
+      consumes:
+      - application/json
+      description: Send a message to a specified chat, and generate an AI response
+      parameters:
+      - description: Chat ID
+        in: path
+        name: chatID
+        required: true
+        type: integer
+      - description: Message content
+        in: body
+        name: message
+        required: true
+        schema:
+          $ref: '#/definitions/models.MessageSwagger'
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: Message sent successfully
+          schema:
+            $ref: '#/definitions/models.MessageSwagger'
+        "400":
+          description: Invalid input
+          schema:
+            $ref: '#/definitions/handlers.ErrorResponse'
+        "401":
+          description: User not authenticated
+          schema:
+            $ref: '#/definitions/handlers.ErrorResponse'
+        "500":
+          description: Internal server error
+          schema:
+            $ref: '#/definitions/handlers.ErrorResponse'
+      security:
+      - Bearer: []
+      summary: Send a message to a chat
+      tags:
+      - chats
+  /chats/{id}:
+    get:
+      consumes:
+      - application/json
+      description: Retrieve a chat by its ID
+      parameters:
+      - description: Chat ID
+        in: path
+        name: id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/models.Chat'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/handlers.ErrorResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/handlers.ErrorResponse'
+      security:
+      - Bearer: []
+      summary: Get a chat by ID
+      tags:
+      - chats
   /faq:
     get:
       consumes:
@@ -211,7 +379,7 @@ paths:
       produces:
       - application/json
       responses:
-        "302":
+        "200":
           description: Redirects to Google login
           schema:
             type: string
@@ -219,6 +387,8 @@ paths:
           description: OAuth2 config is not initialized
           schema:
             type: string
+      security:
+      - googleOAuth2: []
       summary: Redirects to Google OAuth2 login
       tags:
       - Auth

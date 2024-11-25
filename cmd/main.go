@@ -4,6 +4,11 @@
 // @securityDefinitions.apiKey Bearer
 // @in header
 // @name Authorization
+// @securityDefinitions.oauth2.authorizationCode googleOAuth2
+// @tokenUrl https://oauth2.googleapis.com/token
+// @authorizationUrl https://accounts.google.com/o/oauth2/auth
+// @scope.email Access to your email
+// @scope.profile Access to your profile information
 // @host localhost:8080
 // @BasePath /
 package main
@@ -27,6 +32,8 @@ import (
 
 // swag init
 //swag init -g cmd/main.go
+// sudo service redis-server start
+// redis-cli  GEt token:aruke  KEYS token:*
 func main() {
 	var wg sync.WaitGroup
 	ctx := context.Background()

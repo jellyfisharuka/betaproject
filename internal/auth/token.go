@@ -5,17 +5,19 @@ import (
 	"betaproject/internal/models"
 	"errors"
 	"fmt"
+	"strings"
 
 	//"log"
 	"net/http"
 	"os"
-	"strings"
+
 	"time"
 
 	//"crypto/rand"
 	//"encoding/hex"
 
 	"github.com/gin-gonic/gin"
+	//"github.com/go-redis/redis"
 	"github.com/golang-jwt/jwt"
 	"gorm.io/gorm"
 )
@@ -35,7 +37,10 @@ func GenerateToken(username string, ID int) (string, error) {
 
 func AuthMiddleware() gin.HandlerFunc {
 	return func(c *gin.Context) {
-		tokenString := c.GetHeader("Authorization")
+		tokenString, err := c.Cookie("token")
+		if err != nil || tokenString == "" {
+		fmt.Println("No token found in cookies")
+		tokenString = c.GetHeader("Authorization")
 		if tokenString == "" {
 			c.JSON(http.StatusUnauthorized, gin.H{"error": "Unauthorized"})
 			c.Abort()
@@ -43,6 +48,7 @@ func AuthMiddleware() gin.HandlerFunc {
 		}
 
 		tokenString = strings.Replace(tokenString, "Bearer ", "", 1)
+	}
 		token, err := jwt.Parse(tokenString, func(token *jwt.Token) (interface{}, error) {
 			if _, ok := token.Method.(*jwt.SigningMethodHMAC); !ok {
 				return nil, fmt.Errorf("Unexpected signing method: %v", token.Header["alg"])
@@ -73,7 +79,156 @@ func AuthMiddleware() gin.HandlerFunc {
 		c.Set("ID", int(userID))
 		c.Next()
 	}
+} 
+
+func AdminMiddleware() gin.HandlerFunc {
+    return func(c *gin.Context) {
+		tokenString, err := c.Cookie("token")
+		if err != nil || tokenString == "" {
+		fmt.Println("No token found in cookies")
+		tokenString = c.GetHeader("Authorization")
+		if tokenString == "" {
+			c.JSON(http.StatusUnauthorized, gin.H{"error": "Unauthorized"})
+			c.Abort()
+			return
+		}
+
+		tokenString = strings.Replace(tokenString, "Bearer ", "", 1)
+	}
+		token, err := jwt.Parse(tokenString, func(token *jwt.Token) (interface{}, error) {
+			if _, ok := token.Method.(*jwt.SigningMethodHMAC); !ok {
+				return nil, fmt.Errorf("Unexpected signing method: %v", token.Header["alg"])
+			}
+			return jwtKey, nil
+		})
+
+		if err != nil || !token.Valid {
+			c.JSON(http.StatusUnauthorized, gin.H{"error": "Invalid token"})
+			c.Abort()
+			return
+		}
+
+		claims, ok := token.Claims.(jwt.MapClaims)
+		if !ok {
+			c.JSON(http.StatusUnauthorized, gin.H{"error": "Invalid token claims"})
+			c.Abort()
+			return
+		}
+		roleID, ok := claims["roleID"].(float64)
+		fmt.Println("Claims: ", claims)
+		if !ok || roleID != 1 {  // Проверка, если роль не админ
+			c.JSON(http.StatusForbidden, gin.H{"error": "Forbidden"})
+			c.Abort()
+			return
+		}
+        c.Next()
+    }
 }
+
+/*func AuthMiddleware() gin.HandlerFunc {
+	return func(c *gin.Context) {
+		// Получаем токен из заголовка
+		tokenString := c.GetHeader("Authorization")
+		if tokenString == "" {
+			c.JSON(http.StatusUnauthorized, gin.H{"error": "Unauthorized"})
+			c.Abort()
+			return
+		}
+
+		// Извлекаем токен после "Bearer "
+		tokenString = strings.Replace(tokenString, "Bearer ", "", 1)
+
+		// Проверяем токен JWT
+		token, err := jwt.Parse(tokenString, func(token *jwt.Token) (interface{}, error) {
+			if _, ok := token.Method.(*jwt.SigningMethodHMAC); !ok {
+				return nil, fmt.Errorf("Unexpected signing method: %v", token.Header["alg"])
+			}
+			return jwtKey, nil
+		})
+
+		if err != nil || !token.Valid {
+			c.JSON(http.StatusUnauthorized, gin.H{"error": "Invalid token"})
+			c.Abort()
+			return
+		}
+
+		// Извлекаем claims из токена
+		claims, ok := token.Claims.(jwt.MapClaims)
+		if !ok {
+			c.JSON(http.StatusUnauthorized, gin.H{"error": "Invalid token claims"})
+			c.Abort()
+			return
+		}
+
+		// Извлекаем userID из claims
+		userID, ok := claims["ID"].(float64)
+		if !ok {
+			c.JSON(http.StatusUnauthorized, gin.H{"error": "User ID not found in token"})
+			c.Abort()
+			return
+		}
+
+		// Проверка токена в Redis
+		redisKey := fmt.Sprintf("token:%d", int(userID)) // создаем ключ на основе userID
+		storedToken, err := db.RedisClient.Get(db.Ctx, redisKey).Result()
+		if err == redis.Nil {
+			// Если токена нет в Redis
+			c.JSON(http.StatusUnauthorized, gin.H{"error": "Token not found in Redis"})
+			c.Abort()
+			return
+		} else if err != nil {
+			// Если произошла ошибка соединения с Redis
+			c.JSON(http.StatusInternalServerError, gin.H{"error": "Internal Server Error"})
+			c.Abort()
+			return
+		}
+
+		// Сравниваем токен из заголовка и из Redis
+		if tokenString != storedToken {
+			c.JSON(http.StatusUnauthorized, gin.H{"error": "Token mismatch"})
+			c.Abort()
+			return
+		}
+
+		// Устанавливаем userID в контекст
+		c.Set("ID", int(userID))
+		c.Next()
+	}
+} */
+
+
+ // Используйте ваш секретный ключ
+
+// parseToken разбирает токен и возвращает claims, если он валиден
+func parseToken(tokenString string) (jwt.MapClaims, error) {
+	token, err := jwt.Parse(tokenString, func(token *jwt.Token) (interface{}, error) {
+		// Проверяем, что используется правильный метод подписи
+		if _, ok := token.Method.(*jwt.SigningMethodHMAC); !ok {
+			return nil, fmt.Errorf("unexpected signing method: %v", token.Header["alg"])
+		}
+		return jwtKey, nil
+	})
+
+	if err != nil || !token.Valid {
+		return nil, fmt.Errorf("invalid token")
+	}
+
+	// Извлекаем claims из токена
+	claims, ok := token.Claims.(jwt.MapClaims)
+	if !ok {
+		return nil, fmt.Errorf("could not parse claims")
+	}
+
+	// Проверяем истечение токена
+	if exp, ok := claims["exp"].(float64); ok {
+		if time.Unix(int64(exp), 0).Before(time.Now()) {
+			return nil, fmt.Errorf("token expired")
+		}
+	}
+
+	return claims, nil
+}
+
 
 func AdminOnly() gin.HandlerFunc {
 	return func(c *gin.Context) {

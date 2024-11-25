@@ -2,6 +2,7 @@ package handlers
 
 import (
 	"context"
+	"fmt"
 	"log"
 	"net/http"
 
@@ -21,7 +22,7 @@ import (
 // @Success 200 {string} string "Generated content"
 // @Failure 500 {string} string "Internal Server Error"
 // @Router /api/generate [post]
-func GenerateHandler(c *gin.Context, llm *googleai.GoogleAI) {
+func GenerateHandler(c *gin.Context, llm *googleai.GoogleAI) (string, error) {
 	
 	prompt, exists := c.Get("prompt")
 
@@ -32,8 +33,7 @@ func GenerateHandler(c *gin.Context, llm *googleai.GoogleAI) {
 
 	promptStr, ok := prompt.(string)
 	if !ok || promptStr == "" {
-		c.JSON(http.StatusBadRequest, gin.H{"error": "Prompt is required"})
-		return
+		return "", fmt.Errorf("Prompt is required and must be a non-empty string")
 	}
 
 	content := []llms.MessageContent{
@@ -44,12 +44,12 @@ func GenerateHandler(c *gin.Context, llm *googleai.GoogleAI) {
 			},
 		},
 	}
-
+    var generatedAnswer string
 	_, err := llm.GenerateContent(c.Request.Context(), content,
 		llms.WithModel("gemini-1.5-flash"),
 		llms.WithMaxTokens(500),
 		llms.WithStreamingFunc(func(ctx context.Context, chunk []byte) error {
-			c.Writer.Write(chunk)
+			generatedAnswer += string(chunk)
 			return nil
 		}),
 	)
@@ -57,6 +57,7 @@ func GenerateHandler(c *gin.Context, llm *googleai.GoogleAI) {
 		log.Printf("Error generating content: %v\n", err)
 		c.JSON(http.StatusInternalServerError, gin.H{"error": "Unable to generate content"})
 	}
+	return generatedAnswer, nil
 }
 
 // IndexHandler godoc

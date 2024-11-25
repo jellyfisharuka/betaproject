@@ -10,17 +10,19 @@ import (
 	*/
 	_ "betaproject/docs" // импортируйте свои swagger-документы
 	"betaproject/internal/auth"
+	"betaproject/internal/db"
 	"betaproject/internal/handlers"
+	"betaproject/internal/repository"
 	"context"
 	"log"
 	"net/http"
 	"net/http/pprof"
+	"path/filepath"
 
 	"github.com/gin-gonic/gin"
 	swaggerFiles "github.com/swaggo/files"
 	ginSwagger "github.com/swaggo/gin-swagger"
 	"github.com/tmc/langchaingo/llms/googleai"
-	
 )
 
 // NewRouter creates and initializes the router with all routes
@@ -62,6 +64,8 @@ func SetupRouter(r *gin.Engine)  {
 	log.Fatalf("Error loading OAuth2 configuration: %v", err)
 }
 log.Printf("OAuth2 Configuration: %+v", handlers.Oauth2Config)
+chatRepo := &repository.ChatRepository{DB: db.DB}
+    chatHandler := &handlers.ChatHandler{Repo: chatRepo}
 if handlers.Oauth2Config == nil {
     log.Fatalf("OAuth2 configuration is nil")
 }
@@ -82,6 +86,13 @@ if handlers.Oauth2Config == nil {
 	r.GET("/oauth2callback", handlers.OAuth2CallbackHandler)
 	r.GET("/googleLogin", handlers.LoginGoogleHandler(handlers.Oauth2Config))
 	r.GET("/faq", handlers.FAQHandler)
+	r.POST("/chats", auth.AuthMiddleware(), chatHandler.CreateChat)
+    r.GET("/chats/:id", auth.AuthMiddleware(), chatHandler.GetChat)
+    r.POST("/chats/:chatID/messages", auth.AuthMiddleware(), func(c *gin.Context) {
+		chatHandler.SendMessage(c, llm) 
+	})
+	r.GET("/chats", auth.AuthMiddleware(), chatHandler.GetAllChats)
+
     pprofGroup := r.Group("/debug/pprof")
     {
         pprofGroup.GET("/", gin.WrapH(http.HandlerFunc(pprof.Index)))
@@ -96,4 +107,18 @@ if handlers.Oauth2Config == nil {
         pprofGroup.GET("/mutex", gin.WrapH(http.HandlerFunc(pprof.Handler("mutex").ServeHTTP)))
     }
 	
+	//r.Static("/static", "./static")
+	
+	//r.GET("/redirect", handlers.RedirectPageHandler)
+
+	//r.GET("/redirect", func(c *gin.Context) {
+      //  c.File("./static/redirect.html") // Предоставляем файл напрямую
+    //})
+	r.LoadHTMLGlob(filepath.Join("..", "static", "*.html")) // Adjusting path to static folder
+
+    // Serve static files
+    r.Static("/static", filepath.Join("..", "static")) // Serve static files
+
+    // Define the redirect route
+    r.GET("/redirect", handlers.RedirectPageHandler)
 }

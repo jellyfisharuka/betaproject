@@ -66,14 +66,6 @@ func HandleOAuth2Callback(code string, c *gin.Context) (*oauth2.Token, error) {
 	return tok, nil
 }
 
-// LoginGoogleHandler redirects the user to the Google OAuth2 login page.
-// @Summary Redirects to Google OAuth2 login
-// @Description Redirects the user to Google's OAuth2 login page to initiate authorization.
-// @Tags Auth
-// @Produce json
-// @Success 302 {string} string "Redirects to Google login"
-// @Failure 500 {string} string "OAuth2 config is not initialized"
-// @Router /googleLogin [get]
 func LoginGoogleHandler(config *oauth2.Config) gin.HandlerFunc {
 	return func(c *gin.Context) {
 		if config == nil {

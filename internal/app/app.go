@@ -46,6 +46,7 @@ func (a *App) initConfig(_ context.Context) error {
         return err
     }
 	db.ConnectDB()
+	db.InitRedis()
 
 	return nil
 

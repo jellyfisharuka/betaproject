@@ -12,7 +12,7 @@ type User struct {
 	Telephone string
 	RoleID    int
 	Role      Role
-	
+	Chats     []Chat
 }
 type SignupSwagger struct {
     Username  string `json:"username"`  // Уникальное имя пользователя
