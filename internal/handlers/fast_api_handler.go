@@ -3,11 +3,20 @@ package handlers
 import (
 	"betaproject/internal/models"
 	"bytes"
+	"context"
 	"encoding/json"
+	"log"
+
+	//"fmt"
+	//"io"
 	"net/http"
 
+	//"os"
+
 	"github.com/gin-gonic/gin"
+	"github.com/sashabaranov/go-openai"
 )
+
 // @Summary GenerateContent
 // @Description Generate content based on the given prompt
 // @Tags generate
@@ -22,7 +31,8 @@ func GeneratePythonHandler(c *gin.Context) {
 		c.JSON(http.StatusBadRequest, gin.H{"error": "Bad request", "details": err.Error()})
 		return
 	}
-	answer, err := generateAnswer(question.Question, question.MaxLength)
+	ctx := c.Request.Context()
+	answer, err := generateChatgpt(ctx, question.Question)
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to generate answer"})
 		return
@@ -62,3 +72,31 @@ func generateAnswer(question string, maxLength int) (string, error) {
 
 	return answerResponse.Answer, nil
 }
+
+
+func generateChatgpt(ctx context.Context, question string) (string, error) {
+	apiKey := "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"
+	client := openai.NewClient(apiKey)
+
+	request := openai.ChatCompletionRequest{
+		Model: "gpt-4o-mini", 
+		Messages: []openai.ChatCompletionMessage{
+			{
+				Role:    "user", 
+				Content: question,
+			},
+		},
+		Temperature: 0.7, 
+	}
+
+	// Выполняем запрос
+	response, err := client.CreateChatCompletion(ctx, request)
+	if err != nil {
+		log.Printf("Error while calling OpenAI: %v", err)
+		return "", err
+	}
+
+	// Возвращаем текст ответа
+	return response.Choices[0].Message.Content, nil
+}
+

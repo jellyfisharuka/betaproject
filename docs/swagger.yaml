@@ -55,8 +55,6 @@ definitions:
     type: object
   models.Question:
     properties:
-      max_length:
-        type: integer
       question:
         type: string
     type: object

@@ -681,9 +681,6 @@ const docTemplate = `{
         "models.Question": {
             "type": "object",
             "properties": {
-                "max_length": {
-                    "type": "integer"
-                },
                 "question": {
                     "type": "string"
                 }
