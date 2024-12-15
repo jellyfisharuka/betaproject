@@ -30,9 +30,12 @@ func NewApp(ctx context.Context) (*App, error) {
 	return a, nil
 }
 func (a *App) initConfig(_ context.Context) error {
-	jsonPath := filepath.Join("..","internal", "config", "config.json")
-	gmailPath:= filepath.Join("..", "internal", "config", "gmail.json")
-	envPath := filepath.Join("..", "pkg", ".env")
+	//jsonPath := filepath.Join("..","internal", "config", "config.json")
+	//gmailPath:= filepath.Join("..", "internal", "config", "gmail.json")
+	//envPath := filepath.Join("..", "pkg", ".env")
+	jsonPath := filepath.Join("/app", "config", "config.json")
+gmailPath := filepath.Join("/app", "config", "gmail.json")
+envPath := filepath.Join("/app", ".env")
 	err := config.LoadJSONConfig(jsonPath)
     if err != nil {
         return err

@@ -11,6 +11,8 @@ services:
       interval: 10s
       timeout: 5s
       retries: 5
+    volumes:
+      - db_data:/var/lib/postgresql/data
     networks:
       - mynetwork
 
@@ -21,8 +23,16 @@ services:
         condition: service_healthy
     environment:
       DB: "postgres://postgres:1234@db:5432/chatbot?sslmode=disable"
+    volumes:
+     - ./internal/config:/app/config
     networks:
       - mynetwork
+    ports:  
+      - "8080:8080" 
+
+volumes:
+  db_data:  # Настройка тома для базы данных
+    driver: local 
 
 networks:
   mynetwork:

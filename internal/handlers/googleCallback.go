@@ -2,9 +2,9 @@ package handlers
 
 import (
 	"betaproject/internal/auth"
-	"betaproject/internal/db"
+//	"betaproject/internal/db"
 	"betaproject/internal/gooogle"
-	"fmt"
+	//"fmt"
 	"net/http"
 
 	"github.com/gin-gonic/gin"
@@ -32,11 +32,11 @@ func OAuth2CallbackHandler(c *gin.Context) {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to create token"})
 		return
 	}
-	err = db.RedisClient.Set(db.Ctx, fmt.Sprintf("token:%s", email), jwtToken, 0).Err()
-	if err != nil {
-		c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to store token"})
-		return
-	}
+	//err = db.RedisClient.Set(db.Ctx, fmt.Sprintf("token:%s", email), jwtToken, 0).Err()
+	//if err != nil {
+	//	c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to store token"})
+	//	return
+	//}
 
 	c.SetCookie("auth_token", jwtToken, 3600, "/", "localhost", false, true)
 	c.JSON(http.StatusOK, gin.H{"message": "Authorization successful!", "token": jwtToken})

@@ -42,11 +42,11 @@ func LoginHandler(c *gin.Context) {
 		return
 	}
 	fmt.Println("Generated token:", token)
-	err = db.RedisClient.Set(db.Ctx, fmt.Sprintf("token:%s", existingUser.Username), token, 0).Err()
-	if err != nil {
-		c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to store token"})
-		return
-	}
+	//err = db.RedisClient.Set(db.Ctx, fmt.Sprintf("token:%s", existingUser.Username), token, 0).Err()
+	//if err != nil {
+	//	c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to store token"})
+	//	return
+	//}
 	c.SetCookie("auth_token", token, 3600, "/", "localhost", false, true)
 	c.JSON(http.StatusOK, gin.H{"token": token})
 

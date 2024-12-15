@@ -59,7 +59,10 @@ func SetupRouter(r *gin.Engine)  {
 		log.Fatal(err)
 	}
 	
-	handlers.Oauth2Config, err = auth.GetOAuth2Config("C:/Users/aruke/Desktop/golang/betaproject/cmd/gmail.json")
+	//handlers.Oauth2Config, err = auth.GetOAuth2Config("C:/Users/aruke/Desktop/golang/betaproject/cmd/gmail.json") ("./internal/config/gmail.json")
+	//handlers.Oauth2Config, err = auth.GetOAuth2Config("./internal/config/gmail.json")
+	log.Printf("Trying to load Gmail config from: %s", "/app/config/gmail.json")
+handlers.Oauth2Config, err = auth.GetOAuth2Config("/app/config/gmail.json")
     if err != nil {
 	log.Fatalf("Error loading OAuth2 configuration: %v", err)
 }
